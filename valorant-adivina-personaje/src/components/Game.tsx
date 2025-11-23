@@ -243,116 +243,127 @@ const Game: FC = () => {
 
   if (showRanking) {
     return (
-      <Ranking 
-        ranking={ranking}
-        onBack={() => setShowRanking(false)}
-        onNewGame={() => setShowRanking(false)}
-      />
+      <div className="main-content">
+        <div className="component-container">
+          <Ranking 
+            ranking={ranking}
+            onBack={() => setShowRanking(false)}
+            onNewGame={() => setShowRanking(false)}
+          />
+        </div>
+      </div>
     );
   }
 
   if (showSessionStats) {
     return (
-      <SessionStats
-        gameState={gameState}
-        ranking={ranking}
-        onNewGame={startNewSession}
-        onViewRanking={() => {
-          setShowSessionStats(false);
-          setShowRanking(true);
-        }}
-      />
+      <div className="main-content">
+        <div className="component-container">
+          <SessionStats
+            gameState={gameState}
+            ranking={ranking}
+            onNewGame={startNewSession}
+            onViewRanking={() => {
+              setShowSessionStats(false);
+              setShowRanking(true);
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="container-fluid">
+    <div className="main-content">
+      
       {/* Session Header */}
-      <div className="row mb-4">
-        <div className="col-12">
-          <div className="card border-danger shadow">
-            <div className="card-body py-3 bg-light">
-              <div className="row align-items-center">
-                <div className="col-md-4">
-                  <h3 className="text-dark mb-0">
-                    <span className="text-danger">🎯</span> Partida {gameState.currentRound}/{gameState.totalRounds}
-                  </h3>
+      <div className="component-container">
+        <div className="centered-card card border-danger shadow">
+          <div className="card-body text-center py-3 bg-light">
+            <div className="row align-items-center">
+              <div className="col-md-4">
+                <h3 className="text-dark mb-0">
+                  <span className="text-danger">🎯</span> Partida {gameState.currentRound}/{gameState.totalRounds}
+                </h3>
+              </div>
+              <div className="col-md-4">
+                <div className="text-warning h4 mb-0 fw-bold">
+                  {gameState.sessionScore} pts
                 </div>
-                <div className="col-md-4 text-center">
-                  <div className="text-warning h4 mb-0 fw-bold">
-                    {gameState.sessionScore} pts
-                  </div>
-                  <small className="text-muted">Puntuación Total</small>
-                </div>
-                <div className="col-md-4 text-end">
-                  <button 
-                    onClick={() => setShowRanking(true)}
-                    className="btn btn-outline-warning"
-                  >
-                    🏆 Ranking
-                  </button>
-                </div>
+                <small className="text-muted">Puntuación Total</small>
+              </div>
+              <div className="col-md-4">
+                <button 
+                  onClick={() => setShowRanking(true)}
+                  className="btn btn-outline-warning"
+                >
+                  🏆 Ranking
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <ScoreBoard 
-        score={gameState.sessionScore}
-        cluesUsed={gameState.cluesUsed}
-        gameStatus={gameState.gameStatus}
-        incorrectGuesses={gameState.incorrectGuesses}
-        currentRound={gameState.currentRound}
-        totalRounds={gameState.totalRounds}
-      />
+      <div className="component-container">
+        <ScoreBoard 
+          score={gameState.sessionScore}
+          cluesUsed={gameState.cluesUsed}
+          gameStatus={gameState.gameStatus}
+          incorrectGuesses={gameState.incorrectGuesses}
+          currentRound={gameState.currentRound}
+          totalRounds={gameState.totalRounds}
+        />
+      </div>
 
       {gameState.currentAgent && (
         <>
-          <ClueDisplay 
-            clue={currentClue}
-            cluesUsed={gameState.cluesUsed}
-            onUseClue={useClue}
-            gameStatus={gameState.gameStatus}
-            incorrectGuesses={gameState.incorrectGuesses}
-          />
+          <div className="component-container">
+            <ClueDisplay 
+              clue={currentClue}
+              cluesUsed={gameState.cluesUsed}
+              onUseClue={useClue}
+              gameStatus={gameState.gameStatus}
+              incorrectGuesses={gameState.incorrectGuesses}
+            />
+          </div>
 
-          <AgentSelector
-            agents={allAgents}
-            selectedAgent={gameState.selectedAgent}
-            onSelectAgent={handleGuess}
-            gameStatus={gameState.gameStatus}
-            incorrectGuesses={gameState.incorrectGuesses}
-          />
+          <div className="component-container">
+            <AgentSelector
+              agents={allAgents}
+              selectedAgent={gameState.selectedAgent}
+              onSelectAgent={handleGuess}
+              gameStatus={gameState.gameStatus}
+              incorrectGuesses={gameState.incorrectGuesses}
+            />
+          </div>
 
           {gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'round-completed' && (
-            <AgentCard 
-              agent={gameState.currentAgent}
-              revealed={true}
-              pointsEarned={gameState.roundScore}
-            />
+            <div className="component-container">
+              <AgentCard 
+                agent={gameState.currentAgent}
+                revealed={true}
+                pointsEarned={gameState.roundScore}
+              />
+            </div>
           )}
 
           {gameState.gameStatus === 'won' && (
-            <div className="row mt-4">
-              <div className="col-12 text-center">
-                <button onClick={nextRound} className="btn btn-success btn-lg fw-bold px-5 py-3">
-                  {gameState.currentRound < gameState.totalRounds ? 
-                    `➡️ Siguiente Agente (${gameState.currentRound}/${gameState.totalRounds})` : 
-                    '🏁 Finalizar Partida'
-                  }
-                </button>
-              </div>
+            <div className="component-container">
+              <button onClick={nextRound} className="btn btn-success btn-lg fw-bold px-5 py-3">
+                {gameState.currentRound < gameState.totalRounds ? 
+                  `➡️ Siguiente Agente (${gameState.currentRound}/${gameState.totalRounds})` : 
+                  '🏁 Finalizar Partida'
+                }
+              </button>
             </div>
           )}
 
           {gameState.gameStatus === 'round-completed' && (
-            <div className="row mt-4">
-              <div className="col-12 text-center">
-                <div className="alert alert-success border-0 shadow">
-                  <h2 className="mb-2">🎉 ¡Partida Completada!</h2>
-                  <p className="mb-0">Calculando puntuación final...</p>
-                </div>
+            <div className="component-container">
+              <div className="alert alert-success border-0 shadow text-center">
+                <h2 className="mb-2">🎉 ¡Partida Completada!</h2>
+                <p className="mb-0">Calculando puntuación final...</p>
               </div>
             </div>
           )}

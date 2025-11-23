@@ -1,92 +1,108 @@
-/* Tema claro por defecto */
-.App {
+/* Reset y centrado absoluto */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+  display: flex;
+  flex-direction: column;
 }
 
-/* Mejoras para las cartas */
-.card {
-  backdrop-filter: blur(10px);
-  transition: transform 0.2s ease-in-out;
+.app-header {
+  background: white;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.card:hover {
-  transform: translateY(-2px);
+.app-header h1 {
+  color: #dc3545;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
-/* Mejoras para botones */
-.btn {
-  transition: all 0.3s ease;
+.app-header p {
+  color: #6c757d;
+  font-size: 1.2rem;
 }
 
-.btn:hover {
-  transform: translateY(-1px);
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  width: 100%;
 }
 
-/* Estilos para imágenes de agentes */
-.agent-portrait img {
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(255, 70, 85, 0.3);
+/* Contenedor principal centrado */
+.main-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.ability img {
-  border-radius: 5px;
+/* Para todos los componentes hijos */
+.component-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-/* Animaciones suaves */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Grid de agentes centrado */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  justify-items: center;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+.agent-button {
+  width: 140px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Responsive improvements */
+/* Cards centradas */
+.centered-card {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .display-4 {
+  .app-header h1 {
     font-size: 2rem;
   }
   
-  .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+  .agents-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
   }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ff4655;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #ce4a56;
-}
-
-/* Mejor contraste para texto */
-.text-dark {
-  color: #212529 !important;
-}
-
-.text-muted {
-  color: #6c757d !important;
-}
-
-/* Fondo blanco para mejor legibilidad */
-.bg-white {
-  background-color: #ffffff !important;
-}
-
-.bg-light {
-  background-color: #f8f9fa !important;
+  
+  .agent-button {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .app-main {
+    padding: 1rem;
+  }
 }
