@@ -1,18 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import type { Agent, GameState, GameSession } from '../types/types';
-
-// Utility: select N random agents from the pool
-const getRandomAgents = (agents: Agent[], count: number): Agent[] => {
-  const shuffled = [...agents].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-};
 import AgentCard from './AgentCard';
 import ClueDisplay from './ClueDisplay';
 import ScoreBoard from './ScoreBoard';
 import AgentSelector from './AgentSelector';
-import SessionStats from './SessionStats.tsx';
-import Ranking from './Ranking.tsx';
+import SessionStats from './SessionStats';
+import Ranking from './Ranking';
 
 const Game: FC = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -24,7 +18,7 @@ const Game: FC = () => {
     availableAgents: [],
     incorrectGuesses: 0,
     currentRound: 1,
-    totalRounds: 5, // 👈 5 agentes por partida
+    totalRounds: 5,
     roundScore: 0,
     sessionScore: 0,
     agentsInSession: [],
@@ -32,23 +26,40 @@ const Game: FC = () => {
   });
 
   const [allAgents, setAllAgents] = useState<Agent[]>([]);
-  const [playerName, setPlayerName] = useState('');
   const [showSessionStats, setShowSessionStats] = useState(false);
-  const [ranking, setRanking] = useState<GameSession[]>(() => {
-    try {
-      const saved = localStorage.getItem('valorant-game-ranking');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [ranking, setRanking] = useState<GameSession[]>([]);
   const [showRanking, setShowRanking] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(true);
 
-  // startSession will be memoized; getRandomAgents is defined below
-  const startSession = useCallback((agents: Agent[]) => {
-    const sessionAgents = getRandomAgents(agents, 5); // 5 agentes por partida
+  useEffect(() => {
+    const savedRanking = localStorage.getItem('valorant-game-ranking');
+    if (savedRanking) {
+      setRanking(JSON.parse(savedRanking));
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await fetch('https://valorant-api.com/v1/agents');
+        const data = await response.json();
+        const playableAgents = data.data.filter((agent: Agent) => 
+          agent.isPlayableCharacter && agent.fullPortrait
+        );
+        setAllAgents(playableAgents);
+        initializeSession(playableAgents);
+      } catch (error) {
+        console.error('Error fetching agents:', error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+
+  const initializeSession = (agents: Agent[]) => {
+    const sessionAgents = getRandomAgents(agents, 5);
     const firstAgent = sessionAgents[0];
-
+    
     setGameState(prev => ({
       ...prev,
       currentAgent: firstAgent,
@@ -63,30 +74,12 @@ const Game: FC = () => {
       sessionCompleted: false,
       availableAgents: agents
     }));
-  }, [setGameState]);
+  };
 
-  // ranking is initialized from localStorage in the useState lazy initializer above
-
-  // Fetch agents from Valorant API
-  useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const response = await fetch('https://valorant-api.com/v1/agents');
-        const data = await response.json();
-        const playableAgents = data.data.filter((agent: Agent) => 
-          agent.isPlayableCharacter && agent.fullPortrait
-        );
-  setAllAgents(playableAgents);
-  startSession(playableAgents);
-      } catch (error) {
-        console.error('Error fetching agents:', error);
-      }
-    };
-
-    fetchAgents();
-  }, [startSession]);
-
-  
+  const getRandomAgents = (agents: Agent[], count: number): Agent[] => {
+    const shuffled = [...agents].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
 
   const getNextClue = () => {
     if (!gameState.currentAgent) return null;
@@ -162,20 +155,19 @@ const Game: FC = () => {
   };
 
   const completeSession = (finalScore: number) => {
-    const correctGuesses = gameState.agentsInSession.filter((_, index) => 
-      index < gameState.currentRound
-    ).length;
-
+    const sessionId = `session_${Date.now()}`;
+    
     const newGameSession: GameSession = {
-      id: Date.now().toString(),
-      playerName: playerName || 'Jugador Anónimo',
+      id: sessionId,
       totalScore: finalScore,
       date: new Date().toLocaleDateString('es-ES'),
       rounds: gameState.totalRounds,
-      correctGuesses: correctGuesses
+      correctGuesses: gameState.currentRound
     };
 
-    const updatedRanking = [newGameSession, ...ranking].sort((a, b) => b.totalScore - a.totalScore).slice(0, 10);
+    const updatedRanking = [newGameSession, ...ranking]
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .slice(0, 10);
     
     setRanking(updatedRanking);
     localStorage.setItem('valorant-game-ranking', JSON.stringify(updatedRanking));
@@ -189,41 +181,61 @@ const Game: FC = () => {
 
   const startNewSession = () => {
     if (allAgents.length > 0) {
-      startSession(allAgents);
+      initializeSession(allAgents);
       setShowSessionStats(false);
-      setPlayerName('');
     }
   };
 
   const currentClue = getNextClue();
 
-  if (!playerName && !gameState.sessionCompleted) {
+  if (showNameModal) {
     return (
-      <div className="player-name-modal">
-        <div className="modal-content">
-          <h2>🎯 Valorant Guessing Game</h2>
-          <p>Introduce tu nombre para el ranking:</p>
-          <input
-            type="text"
-            placeholder="Tu nombre..."
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            className="name-input"
-            maxLength={20}
-          />
-          <button 
-            onClick={() => setPlayerName(playerName || 'Jugador Anónimo')}
-            className="start-game-btn"
-            disabled={!playerName.trim()}
-          >
-            Comenzar Partida
-          </button>
-          <button 
-            onClick={() => setShowRanking(true)}
-            className="view-ranking-btn"
-          >
-            Ver Ranking
-          </button>
+      <div className="modal show d-block" style={{backgroundColor: 'rgba(15, 25, 35, 0.95)'}}>
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content bg-dark border border-danger rounded-3 shadow-lg">
+            <div className="modal-header border-bottom border-danger">
+              <h2 className="modal-title text-danger w-100 text-center fw-bold">
+                🎯 VALORANT GUESSING GAME
+              </h2>
+            </div>
+            <div className="modal-body text-center py-4">
+              <div className="mb-4">
+                <p className="text-light fs-5 mb-3">¿Puedes adivinar el agente con la menor cantidad de pistas?</p>
+                <p className="text-muted">Cada partida contiene 5 agentes aleatorios</p>
+              </div>
+              
+              <div className="game-rules mb-4 p-3 bg-dark border rounded">
+                <h5 className="text-warning mb-3">🏆 Sistema de Puntos</h5>
+                <div className="row text-start">
+                  <div className="col-6">
+                    <small className="text-success">✓ Pista inicial: GRATIS</small><br/>
+                    <small className="text-warning">✓ Pistas extra: -20 pts</small>
+                  </div>
+                  <div className="col-6">
+                    <small className="text-danger">✗ Fallos: -10 pts</small><br/>
+                    <small className="text-info">🎯 Máximo: 100 pts/ronda</small>
+                  </div>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setShowNameModal(false)}
+                className="btn btn-danger btn-lg w-100 fw-bold py-3"
+              >
+                🎮 COMENZAR PARTIDA
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setShowNameModal(false);
+                  setShowRanking(true);
+                }}
+                className="btn btn-outline-light w-100 mt-2"
+              >
+                📊 Ver Ranking
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -234,10 +246,7 @@ const Game: FC = () => {
       <Ranking 
         ranking={ranking}
         onBack={() => setShowRanking(false)}
-        onNewGame={() => {
-          setShowRanking(false);
-          setPlayerName('');
-        }}
+        onNewGame={() => setShowRanking(false)}
       />
     );
   }
@@ -246,7 +255,6 @@ const Game: FC = () => {
     return (
       <SessionStats
         gameState={gameState}
-        playerName={playerName}
         ranking={ranking}
         onNewGame={startNewSession}
         onViewRanking={() => {
@@ -258,16 +266,36 @@ const Game: FC = () => {
   }
 
   return (
-    <div className="game-container">
-      <div className="session-header">
-        <h3>Partida {gameState.currentRound}/{gameState.totalRounds}</h3>
-        <div className="session-score">Puntuación: {gameState.sessionScore} pts</div>
-        <button 
-          onClick={() => setShowRanking(true)}
-          className="ranking-btn"
-        >
-          🏆 Ranking
-        </button>
+    <div className="container-fluid">
+      {/* Session Header */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="card bg-dark border-danger shadow">
+            <div className="card-body py-3">
+              <div className="row align-items-center">
+                <div className="col-md-4">
+                  <h3 className="text-light mb-0">
+                    <span className="text-danger">🎯</span> Partida {gameState.currentRound}/{gameState.totalRounds}
+                  </h3>
+                </div>
+                <div className="col-md-4 text-center">
+                  <div className="text-warning h4 mb-0 fw-bold">
+                    {gameState.sessionScore} pts
+                  </div>
+                  <small className="text-muted">Puntuación Total</small>
+                </div>
+                <div className="col-md-4 text-end">
+                  <button 
+                    onClick={() => setShowRanking(true)}
+                    className="btn btn-outline-warning"
+                  >
+                    🏆 Ranking
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <ScoreBoard 
@@ -306,20 +334,26 @@ const Game: FC = () => {
           )}
 
           {gameState.gameStatus === 'won' && (
-            <div className="next-round-container">
-              <button onClick={nextRound} className="next-round-btn">
-                {gameState.currentRound < gameState.totalRounds ? 
-                  `Siguiente Agente (${gameState.currentRound}/${gameState.totalRounds}) →` : 
-                  'Finalizar Partida'
-                }
-              </button>
+            <div className="row mt-4">
+              <div className="col-12 text-center">
+                <button onClick={nextRound} className="btn btn-success btn-lg fw-bold px-5 py-3">
+                  {gameState.currentRound < gameState.totalRounds ? 
+                    `➡️ Siguiente Agente (${gameState.currentRound}/${gameState.totalRounds})` : 
+                    '🏁 Finalizar Partida'
+                  }
+                </button>
+              </div>
             </div>
           )}
 
           {gameState.gameStatus === 'round-completed' && (
-            <div className="round-completed">
-              <h2>🎉 ¡Partida Completada!</h2>
-              <p>Calculando puntuación final...</p>
+            <div className="row mt-4">
+              <div className="col-12 text-center">
+                <div className="alert alert-success border-0 shadow">
+                  <h2 className="mb-2">🎉 ¡Partida Completada!</h2>
+                  <p className="mb-0">Calculando puntuación final...</p>
+                </div>
+              </div>
             </div>
           )}
         </>

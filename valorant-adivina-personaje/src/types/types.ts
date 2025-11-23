@@ -37,7 +37,6 @@ export interface GameState {
 
 export interface GameSession {
   id: string;
-  playerName: string;
   totalScore: number;
   date: string;
   rounds: number;

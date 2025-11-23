@@ -17,31 +17,55 @@ const ScoreBoard: React.FC<ScoreBoardProps> = ({
   currentRound = 1,
   totalRounds = 1
 }) => {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'playing': return 'bg-primary';
+      case 'won': return 'bg-success';
+      case 'round-completed': return 'bg-info';
+      default: return 'bg-secondary';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'playing': return 'Jugando';
+      case 'won': return '¡Correcto!';
+      case 'round-completed': return 'Partida Completa';
+      default: return 'Perdido';
+    }
+  };
+
   return (
-    <div className="score-board">
-      <div className="score-item">
-        <span className="label">Ronda:</span>
-        <span className="value">{currentRound}/{totalRounds}</span>
-      </div>
-      <div className="score-item">
-        <span className="label">Puntuación:</span>
-        <span className="value">{score} pts</span>
-      </div>
-      <div className="score-item">
-        <span className="label">Pistas usadas:</span>
-        <span className="value">{cluesUsed}</span>
-      </div>
-      <div className="score-item">
-        <span className="label">Fallos:</span>
-        <span className="value incorrect">{incorrectGuesses}</span>
-      </div>
-      <div className="score-item">
-        <span className="label">Estado:</span>
-        <span className={`status ${gameStatus}`}>
-          {gameStatus === 'playing' ? 'Jugando' : 
-           gameStatus === 'won' ? '¡Correcto!' :
-           gameStatus === 'round-completed' ? 'Partida Completa' : 'Perdido'}
-        </span>
+    <div className="row mb-4">
+      <div className="col-12">
+        <div className="card bg-dark border-light">
+          <div className="card-body">
+            <div className="row text-center">
+              <div className="col-md-2 mb-3 mb-md-0">
+                <div className="text-muted small">Ronda</div>
+                <div className="h4 text-light">{currentRound}/{totalRounds}</div>
+              </div>
+              <div className="col-md-2 mb-3 mb-md-0">
+                <div className="text-muted small">Puntuación</div>
+                <div className="h4 text-warning">{score} pts</div>
+              </div>
+              <div className="col-md-2 mb-3 mb-md-0">
+                <div className="text-muted small">Pistas Usadas</div>
+                <div className="h4 text-info">{cluesUsed}</div>
+              </div>
+              <div className="col-md-2 mb-3 mb-md-0">
+                <div className="text-muted small">Fallos</div>
+                <div className="h4 text-danger">{incorrectGuesses}</div>
+              </div>
+              <div className="col-md-4">
+                <div className="text-muted small">Estado</div>
+                <span className={`badge ${getStatusBadge(gameStatus)} fs-6`}>
+                  {getStatusText(gameStatus)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

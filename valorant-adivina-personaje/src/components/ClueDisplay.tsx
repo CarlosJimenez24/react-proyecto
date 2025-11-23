@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 
 interface ClueDisplayProps {
   clue: string | null;
@@ -8,84 +8,75 @@ interface ClueDisplayProps {
   incorrectGuesses: number;
 }
 
-const ClueDisplay: React.FC<ClueDisplayProps> = ({ 
+const ClueDisplay: FC<ClueDisplayProps> = ({ 
   clue, 
   cluesUsed, 
   onUseClue, 
   gameStatus,
   incorrectGuesses
 }) => {
-  // 👇 Calculamos pistas adicionales (excluyendo la primera gratuita)
   const additionalClues = Math.max(0, cluesUsed - 1);
 
   return (
-    <div className="clue-display">
-      <h3>Pistas Disponibles</h3>
-      
-      {/* 👇 Mensaje especial para la primera pista */}
-      {cluesUsed === 1 && (
-        <div className="free-clue-banner">
-          🎁 <strong>Pista inicial gratuita</strong> - ¡No afecta tu puntuación!
-        </div>
-      )}
-      
-      <div className="clue-content">
-        <div className="clue-text">
-          <strong>Pista {cluesUsed}:</strong> {clue}
-        </div>
-      </div>
-      
-      {gameStatus === 'playing' && (
-        <button 
-          onClick={onUseClue}
-          disabled={cluesUsed >= 5} // 👈 Máximo 5 pistas en total
-          className="clue-btn"
-        >
-          {cluesUsed === 1 ? 'Obtener Segunda Pista' : `Obtener Pista ${cluesUsed + 1}`} 
-          ({cluesUsed}/5 total)
-        </button>
-      )}
+    <div className="row mb-4">
+      <div className="col-12">
+        <div className="card bg-dark border-info">
+          <div className="card-header bg-info text-dark">
+            <h4 className="mb-0">🔍 Pistas Disponibles</h4>
+          </div>
+          <div className="card-body">
+            {cluesUsed === 1 && (
+              <div className="alert alert-success mb-3">
+                🎁 <strong>Pista inicial gratuita</strong> - ¡No afecta tu puntuación!
+              </div>
+            )}
+            
+            <div className="bg-dark border rounded p-4 text-center mb-3">
+              <h5 className="text-light">
+                <strong>Pista {cluesUsed}:</strong> {clue}
+              </h5>
+            </div>
+            
+            {gameStatus === 'playing' && (
+              <div className="text-center">
+                <button 
+                  onClick={onUseClue}
+                  disabled={cluesUsed >= 5}
+                  className="btn btn-info btn-lg"
+                >
+                  {cluesUsed === 1 ? 'Obtener Segunda Pista' : `Obtener Pista ${cluesUsed + 1}`} 
+                  ({cluesUsed}/5 total)
+                </button>
+              </div>
+            )}
 
-      <div className="points-info">
-        <small>
-          💡 <strong>Sistema de puntos:</strong>
-        </small>
-        <br />
-        <small>
-          • Puntos base: 100 puntos
-        </small>
-        <br />
-        <small>
-          • Pista inicial: <strong>GRATUITA</strong> (0 penalización)
-        </small>
-        <br />
-        <small>
-          • Pistas adicionales: -20 puntos cada una
-        </small>
-        <br />
-        <small>
-          • Fallos: -10 puntos cada uno
-        </small>
-        <br />
-        <small>
-          • Puntuación mínima: 0 puntos
-        </small>
-        {additionalClues > 0 && (
-          <>
-            <br />
-            <small className="current-penalty">
-              • Penalización actual: -{additionalClues * 20} puntos (por {additionalClues} pista(s) adicional(es))
-            </small>
-          </>
-        )}
-        {incorrectGuesses > 0 && (
-          <>
-            <br />
-            <small className="current-fails">
-              • Fallos actuales: {incorrectGuesses} (-{incorrectGuesses * 10} puntos)
-            </small>
-          </>
-        )}
+            <div className="mt-3 p-3 bg-dark border rounded">
+              <h6 className="text-warning mb-2">💡 Sistema de puntos:</h6>
+              <div className="row text-small">
+                <div className="col-md-6">
+                  <div>• Puntos base: <strong>100 puntos</strong></div>
+                  <div>• Pista inicial: <strong className="text-success">GRATUITA</strong></div>
+                </div>
+                <div className="col-md-6">
+                  <div>• Pistas adicionales: <strong className="text-warning">-20 puntos</strong></div>
+                  <div>• Fallos: <strong className="text-danger">-10 puntos</strong></div>
+                </div>
+              </div>
+              {additionalClues > 0 && (
+                <div className="mt-2 text-center">
+                  <small className="text-warning">
+                    Penalización actual: -{additionalClues * 20} puntos (por {additionalClues} pista(s) adicional(es))
+                  </small>
+                </div>
+              )}
+              {incorrectGuesses > 0 && (
+                <div className="mt-2 text-center">
+                  <small className="text-danger">Fallos actuales: {incorrectGuesses} ( -{incorrectGuesses * 10} pts )</small>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
