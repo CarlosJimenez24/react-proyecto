@@ -339,4 +339,90 @@ body {
   .agent-portrait img {
     max-width: 200px;
   }
+  .penalty-warning {
+  margin-bottom: 15px;
+  }
+
+  .penalty-alert {
+    background: rgba(255, 70, 85, 0.2);
+    border: 1px solid #ff4655;
+    border-radius: 8px;
+    padding: 10px 15px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .score-item .value.incorrect {
+    color: #ff4655;
+  }
+
+  .points-summary {
+    margin: 10px 0;
+  }
+
+  .points-earned {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .guess-feedback {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 70, 85, 0.1);
+    border: 1px solid #ff4655;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+  }
+  /* Estilos para la pista gratuita */
+  .free-clue-banner {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    border: 2px solid #3d8b40;
+  }
+
+  .clue-content {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .clue-text {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .points-info {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .current-penalty {
+    color: #ffa726;
+    font-weight: bold;
+  }
+
+  /* Mejora visual para el botón de pistas */
+  .clue-btn:disabled {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+  }
 }

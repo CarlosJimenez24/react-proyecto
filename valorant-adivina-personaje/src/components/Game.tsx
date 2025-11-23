@@ -1,5 +1,5 @@
-import type { FC } from 'react';
 import { useState, useEffect } from 'react';
+import type { FC } from 'react';
 import type { Agent, GameState } from '../types/types';
 import AgentCard from './AgentCard';
 import ClueDisplay from './ClueDisplay';
@@ -9,11 +9,12 @@ import AgentSelector from './AgentSelector';
 const Game: FC = () => {
   const [gameState, setGameState] = useState<GameState>({
     currentAgent: null,
-    cluesUsed: 0,
+    cluesUsed: 1, // 👈 Empieza en 1 (primera pista gratuita)
     score: 0,
     gameStatus: 'playing',
     selectedAgent: '',
-    availableAgents: []
+    availableAgents: [],
+    incorrectGuesses: 0
   });
 
   const [allAgents, setAllAgents] = useState<Agent[]>([]);
@@ -42,10 +43,11 @@ const Game: FC = () => {
     setGameState(prev => ({
       ...prev,
       currentAgent: randomAgent,
-      cluesUsed: 0,
+      cluesUsed: 1, // 👈 Siempre empieza con 1 pista
       gameStatus: 'playing',
       selectedAgent: '',
-      availableAgents: agents
+      availableAgents: agents,
+      incorrectGuesses: 0
     }));
   };
 
@@ -53,17 +55,21 @@ const Game: FC = () => {
     if (!gameState.currentAgent) return null;
 
     const clues = [
-      `Rol: ${gameState.currentAgent.role.displayName}`,
-      `Habilidad 1: ${gameState.currentAgent.abilities[0]?.displayName || 'Desconocida'}`,
-      `Habilidad 2: ${gameState.currentAgent.abilities[1]?.displayName || 'Desconocida'}`,
-      `Descripción: ${gameState.currentAgent.description.substring(0, 100)}...`,
-      `Habilidad definitiva: ${gameState.currentAgent.abilities[3]?.displayName || 'Desconocida'}`
+      `Rol: ${gameState.currentAgent.role.displayName}`, // 👈 Pista 1 (gratuita)
+      `Habilidad 1: ${gameState.currentAgent.abilities[0]?.displayName || 'Desconocida'}`, // Pista 2
+      `Habilidad 2: ${gameState.currentAgent.abilities[1]?.displayName || 'Desconocida'}`, // Pista 3
+      `Descripción: ${gameState.currentAgent.description.substring(0, 100)}...`, // Pista 4
+      `Habilidad definitiva: ${gameState.currentAgent.abilities[3]?.displayName || 'Desconocida'}` // Pista 5
     ];
 
-    return clues[gameState.cluesUsed] || 'No hay más pistas disponibles';
+    // 👇 Aseguramos que siempre haya al menos una pista disponible
+    return clues[gameState.cluesUsed - 1] || clues[clues.length - 1];
   };
 
   const useClue = () => {
+    // 👇 No permitir más de 5 pistas en total
+    if (gameState.cluesUsed >= 5) return;
+    
     setGameState(prev => ({
       ...prev,
       cluesUsed: prev.cluesUsed + 1
@@ -71,20 +77,26 @@ const Game: FC = () => {
   };
 
   const handleGuess = (agentName: string) => {
-    if (!gameState.currentAgent) return;
+    if (!gameState.currentAgent || gameState.gameStatus !== 'playing') return;
 
     if (agentName === gameState.currentAgent.displayName) {
-      const points = Math.max(100 - (gameState.cluesUsed * 20), 10);
+      // 👇 Cálculo de puntos - la primera pista NO penaliza
+      const basePoints = Math.max(100 - (Math.max(0, gameState.cluesUsed - 1) * 20), 10);
+      const penalty = gameState.incorrectGuesses * 10;
+      const finalPoints = Math.max(basePoints - penalty, 0);
+      
       setGameState(prev => ({
         ...prev,
         gameStatus: 'won',
-        score: prev.score + points,
+        score: prev.score + finalPoints,
         selectedAgent: agentName
       }));
     } else {
       setGameState(prev => ({
         ...prev,
-        selectedAgent: agentName
+        selectedAgent: agentName,
+        incorrectGuesses: prev.incorrectGuesses + 1,
+        score: Math.max(prev.score - 10, 0)
       }));
     }
   };
@@ -101,6 +113,7 @@ const Game: FC = () => {
         score={gameState.score}
         cluesUsed={gameState.cluesUsed}
         gameStatus={gameState.gameStatus}
+        incorrectGuesses={gameState.incorrectGuesses}
       />
 
       {gameState.currentAgent && (
@@ -110,6 +123,7 @@ const Game: FC = () => {
             cluesUsed={gameState.cluesUsed}
             onUseClue={useClue}
             gameStatus={gameState.gameStatus}
+            incorrectGuesses={gameState.incorrectGuesses}
           />
 
           <AgentSelector
@@ -117,12 +131,21 @@ const Game: FC = () => {
             selectedAgent={gameState.selectedAgent}
             onSelectAgent={handleGuess}
             gameStatus={gameState.gameStatus}
+            incorrectGuesses={gameState.incorrectGuesses}
           />
 
           {gameState.gameStatus !== 'playing' && (
             <AgentCard 
               agent={gameState.currentAgent}
               revealed={true}
+              pointsEarned={
+                gameState.gameStatus === 'won' 
+                  ? Math.max(
+                      100 - (Math.max(0, gameState.cluesUsed - 1) * 20) - (gameState.incorrectGuesses * 10), 
+                      0
+                    )
+                  : 0
+              }
             />
           )}
 

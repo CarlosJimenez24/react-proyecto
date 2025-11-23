@@ -25,4 +25,5 @@ export interface GameState {
   gameStatus: 'playing' | 'won' | 'lost';
   selectedAgent: string;
   availableAgents: Agent[];
+  incorrectGuesses: number;
 }
