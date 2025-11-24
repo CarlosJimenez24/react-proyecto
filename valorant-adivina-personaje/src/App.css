@@ -238,6 +238,215 @@ body, html, #root {
   border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
+/* ===== ARREGLOS DE TEXTO INVISIBLE ===== */
+
+/* Texto "Puntuación Total" y otros textos muted */
+.text-muted {
+  color: #8b949e !important;
+  opacity: 0.8 !important;
+}
+
+/* Rol de los agentes debajo del nombre */
+.agent-button .text-muted {
+  color: #a8b5c0 !important;
+  font-size: 0.75rem !important;
+  margin-top: 2px !important;
+}
+
+/* Textos en cards que no son visibles */
+.card .text-dark,
+.card .text-muted {
+  color: var(--valorant-text) !important;
+}
+
+/* Headers en cards */
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6 {
+  color: var(--valorant-text) !important;
+}
+
+/* Textos específicos en el header de sesión */
+.card-body .text-dark {
+  color: var(--valorant-text) !important;
+}
+
+/* Labels en el ScoreBoard y otros componentes */
+.small, .text-small {
+  color: var(--valorant-text-muted) !important;
+}
+
+/* Textos en botones de agentes */
+.agent-button small {
+  color: var(--valorant-text) !important;
+}
+
+.agent-button .text-muted {
+  color: var(--valorant-text-muted) !important;
+}
+
+/* Textos en modales */
+.modal-content .text-dark,
+.modal-content .text-muted {
+  color: var(--valorant-text) !important;
+}
+
+/* Textos en alerts */
+.alert .text-dark,
+.alert .text-muted {
+  color: inherit !important;
+}
+
+/* Textos específicos en el sistema de puntos */
+.game-rules .text-success {
+  color: #75b798 !important;
+}
+
+.game-rules .text-warning {
+  color: #f7d500 !important;
+}
+
+.game-rules .text-danger {
+  color: #ff8a98 !important;
+}
+
+.game-rules .text-info {
+  color: #6edff6 !important;
+}
+
+/* Textos en badges */
+.badge.text-dark {
+  color: var(--valorant-text) !important;
+}
+
+/* Textos en inputs placeholder */
+.form-control::placeholder {
+  color: var(--valorant-text-muted) !important;
+  opacity: 0.7 !important;
+}
+
+/* Textos en el ranking */
+.ranking-item .text-dark {
+  color: var(--valorant-text) !important;
+}
+
+.ranking-item .text-muted {
+  color: var(--valorant-text-muted) !important;
+}
+
+/* Textos en SessionStats */
+.session-stats .text-dark {
+  color: var(--valorant-text) !important;
+}
+
+.session-stats .text-muted {
+  color: var(--valorant-text-muted) !important;
+}
+
+/* Override específico para textos que siguen siendo oscuros */
+.text-dark, 
+.card .text-dark,
+.bg-light .text-dark,
+.bg-white .text-dark {
+  color: var(--valorant-text) !important;
+}
+
+/* Asegurar que todos los textos sean visibles */
+.component-container * {
+  color: var(--valorant-text) !important;
+}
+
+.component-container .text-muted {
+  color: var(--valorant-text-muted) !important;
+}
+
+/* Textos específicos en botones outline */
+.btn-outline-warning,
+.btn-outline-light,
+.btn-outline-dark {
+  color: var(--valorant-text) !important;
+}
+
+.btn-outline-warning:hover,
+.btn-outline-light:hover,
+.btn-outline-dark:hover {
+  color: var(--valorant-dark) !important;
+}
+
+/* ===== SELECT PERSONALIZADO VALORANT ===== */
+.valorant-select {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: var(--valorant-text) !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.valorant-select:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.valorant-select:focus {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--valorant-red) !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 70, 85, 0.25) !important;
+  color: var(--valorant-text) !important;
+}
+
+.valorant-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Para navegadores Webkit (Chrome, Safari) */
+.valorant-select option {
+  background: var(--card-bg) !important;
+  color: var(--valorant-text) !important;
+  padding: 12px !important;
+  border: none !important;
+}
+
+.valorant-select option:hover {
+  background: var(--valorant-red) !important;
+  color: white !important;
+}
+
+.valorant-select option:checked {
+  background: var(--valorant-red) !important;
+  color: white !important;
+}
+
+/* Para Firefox */
+@-moz-document url-prefix() {
+  .valorant-select option {
+    background: var(--card-bg) !important;
+    color: var(--valorant-text) !important;
+  }
+  
+  .valorant-select option:checked {
+    background: var(--valorant-red) !important;
+    color: white !important;
+  }
+}
+
+/* Contenedor del filtro para mejor espaciado */
+.role-filter-container {
+  position: relative;
+}
+
+.role-filter-container::after {
+  content: "▼";
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--valorant-text-muted);
+  pointer-events: none;
+  font-size: 12px;
+}
+
 /* ===== COMPONENTES ESPECÍFICOS ===== */
 
 /* Grid de agentes */
@@ -307,6 +516,37 @@ body, html, #root {
 
 .text-light {
   color: var(--valorant-text) !important;
+}
+
+/* ===== OVERRIDE NUCLEAR PARA TEXTOS ===== */
+
+/* Fuerza que TODOS los textos sean visibles */
+.app-container * {
+  color: var(--valorant-text) !important;
+}
+
+/* Excepto los textos muted que deben ser un poco más claros */
+.app-container .text-muted {
+  color: var(--valorant-text-muted) !important;
+}
+
+/* Override específico para elementos que podrían tener color heredado */
+.card *:not(.text-muted):not(.btn):not(.badge) {
+  color: var(--valorant-text) !important;
+}
+
+/* Para los botones que necesitan texto oscuro al hacer hover */
+.btn:hover * {
+  color: inherit !important;
+}
+
+/* Textos en agentes específicamente */
+.agent-button * {
+  color: var(--valorant-text) !important;
+}
+
+.agent-button .text-muted {
+  color: var(--valorant-text-muted) !important;
 }
 
 /* Responsive */

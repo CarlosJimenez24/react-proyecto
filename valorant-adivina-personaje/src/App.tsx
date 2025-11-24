@@ -10,7 +10,6 @@ function App() {
         <p>¿Puedes adivinar el agente con la menor cantidad de pistas?</p>
       </header>
       <main className="app-main">
-        <Hero />
         <Game />
       </main>
     </div>
